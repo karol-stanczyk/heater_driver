@@ -14,23 +14,35 @@ long lastRemoteCheck;
 //REMOTE
 
 //APPLICATION
+#define APPLICATION_STATE_CHECK_INTERVAL 1000
 int applicationState = RUNNING;
+int applicationStateTime;
 //APPLICATION
+
+
 
 void loop() {
 	long now = millis();
-	if (applicationState != RUNNING)
-		turnOffHeater();
-	switch(applicationState) {
-		case RUNNING: {
-			displayBaseScreen();
-			checkTemperature(now);
-		} break;
-		case TEMPERATURE_MENU: showTemperatureMenu();
+	if (applicationState != RUNNING){
+		turnOffHeater();	
 	}
+	checkApplicationState(now);
 	checkRemoteRequest(now);
 	resetApplicationState(now);
 	delay(20);
+}
+
+void checkApplicationState(long currentTime) {
+	if(currentTime - applicationStateTime > APPLICATION_STATE_CHECK_INTERVAL) {
+		switch(applicationState) {
+			case RUNNING: {
+				displayBaseScreen();
+				checkTemperature(now);
+			} break;
+			case TEMPERATURE_MENU: showTemperatureMenu();
+		}	
+		applicationStateTime = currentTime;
+	}
 }
 
 void checkTemperature(long currentTime) {
